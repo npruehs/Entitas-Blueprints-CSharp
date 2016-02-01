@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{63C080A9-E037-4D79-B51D-E2DF8E1EE826}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Entitas.Blueprints</RootNamespace>
+    <AssemblyName>Entitas.Blueprints</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <BaseIntermediateOutputPath>..\..\Obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Bin\$(MSBuildProjectName)\$(Platform)\$(Configuration)\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <BaseIntermediateOutputPath>..\..\Obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\Bin\$(MSBuildProjectName)\$(Platform)\$(Configuration)\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Entitas.CodeGenerator\Attributes\CustomPrefixAttribute.cs" />
+    <Compile Include="Entitas.CodeGenerator\Attributes\DontGenerateAttribute.cs" />
+    <Compile Include="Entitas.CodeGenerator\Attributes\PoolAttribute.cs" />
+    <Compile Include="Entitas.CodeGenerator\Attributes\SingleEntityAttribute.cs" />
+    <Compile Include="Entitas.CodeGenerator\CodeGenerator.cs" />
+    <Compile Include="Entitas.CodeGenerator\CodeGenFile.cs" />
+    <Compile Include="Entitas.CodeGenerator\Generators\ComponentLookupGenerator.cs" />
+    <Compile Include="Entitas.CodeGenerator\Generators\ComponentsGenerator.cs" />
+    <Compile Include="Entitas.CodeGenerator\Generators\PoolAttributeGenerator.cs" />
+    <Compile Include="Entitas.CodeGenerator\Generators\PoolsGenerator.cs" />
+    <Compile Include="Entitas.CodeGenerator\Generators\SystemsGenerator.cs" />
+    <Compile Include="Entitas.CodeGenerator\Generators\TypeGenerator.cs" />
+    <Compile Include="Entitas.CodeGenerator\ICodeGenerator.cs" />
+    <Compile Include="Entitas.CodeGenerator\IComponentCodeGenerator.cs" />
+    <Compile Include="Entitas.CodeGenerator\IPoolCodeGenerator.cs" />
+    <Compile Include="Entitas.CodeGenerator\ISystemCodeGenerator.cs" />
+    <Compile Include="Entitas\EntitasException.cs" />
+    <Compile Include="Entitas\Entity.cs" />
+    <Compile Include="Entitas\Extensions\CollectionExtension.cs" />
+    <Compile Include="Entitas\Extensions\GroupExtension.cs" />
+    <Compile Include="Entitas\Extensions\IMatcherExtension.cs" />
+    <Compile Include="Entitas\Extensions\PoolExtension.cs" />
+    <Compile Include="Entitas\Group.cs" />
+    <Compile Include="Entitas\GroupObserver.cs" />
+    <Compile Include="Entitas\Interfaces\IComponent.cs" />
+    <Compile Include="Entitas\Interfaces\IExecuteSystem.cs" />
+    <Compile Include="Entitas\Interfaces\IInitializeSystem.cs" />
+    <Compile Include="Entitas\Interfaces\IMatcher.cs" />
+    <Compile Include="Entitas\Interfaces\IReactiveSystem.cs" />
+    <Compile Include="Entitas\Interfaces\ISystem.cs" />
+    <Compile Include="Entitas\Matcher\Matcher.cs" />
+    <Compile Include="Entitas\Matcher\MatcherEquals.cs" />
+    <Compile Include="Entitas\Matcher\MatcherInterfaces.cs" />
+    <Compile Include="Entitas\Matcher\MatcherStatic.cs" />
+    <Compile Include="Entitas\Matcher\MatcherToString.cs" />
+    <Compile Include="Entitas\Matcher\TriggerOnEvent.cs" />
+    <Compile Include="Entitas\Pool.cs" />
+    <Compile Include="Entitas\ReactiveSystem.cs" />
+    <Compile Include="Entitas\Systems.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
