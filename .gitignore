@@ -25,3 +25,5 @@ ExportedObj/
 # Unity3D Generated File On Crash Reports
 sysinfo.txt
 Bin/
+Source/Entitas.Blueprints/Entitas/
+Source/Entitas.Blueprints/Entitas.CodeGenerator/
