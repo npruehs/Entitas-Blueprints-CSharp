@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entitas.Blueprints\BlueprintExtensionsGenerator.cs" />
     <Compile Include="Entitas.CodeGenerator\Attributes\CustomPrefixAttribute.cs" />
     <Compile Include="Entitas.CodeGenerator\Attributes\DontGenerateAttribute.cs" />
     <Compile Include="Entitas.CodeGenerator\Attributes\PoolAttribute.cs" />
