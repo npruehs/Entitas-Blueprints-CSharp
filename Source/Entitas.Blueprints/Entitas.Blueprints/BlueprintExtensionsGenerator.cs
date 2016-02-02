@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using System.Text;
 
     using Entitas.CodeGenerator;
 
@@ -13,7 +14,7 @@
 
         public CodeGenFile[] Generate(Type[] components)
         {
-            return components
+            var codeGenFiles = components
                     .Where(shouldGenerate)
                     .Aggregate(new List<CodeGenFile>(), (files, type) => {
                         files.Add(new CodeGenFile
@@ -22,7 +23,16 @@
                             fileContent = addDefaultPoolCode(type).ToUnixLineEndings()
                         });
                         return files;
-                    }).ToArray();
+                    }).ToList();
+
+            codeGenFiles.Add(new CodeGenFile
+            {
+                fileName = "BlueprintPoolExtensions",
+                fileContent = addBlueprintPoolCode(components
+                    .Where(shouldGenerate)).ToUnixLineEndings()
+            });
+
+            return codeGenFiles.ToArray();
         }
 
         static bool shouldGenerate(Type type)
@@ -41,6 +51,16 @@
             return code;
         }
 
+        static string addBlueprintPoolCode(IEnumerable<Type> types)
+        {
+            var code = addNamespace();
+            code += addPoolExtensionClassHeader();
+            code += addCreateEntityMethod(types);
+            code += addCloseClass();
+            code += closeNamespace();
+            return code;
+        }
+
         static string addNamespace()
         {
             return @"namespace Entitas {";
@@ -49,6 +69,11 @@
         static string addEntityClassHeader()
         {
             return "\n    public partial class Entity {";
+        }
+
+        static string addPoolExtensionClassHeader()
+        {
+            return "\n    public static class BlueprintPoolExtension {";
         }
 
         static string addBlueprintMethod(Type type)
@@ -67,6 +92,34 @@
             return AddComponent({4}.{0}, component);
         }}
 ", name, nameLowercaseFirst, type, assignments, ids);
+        }
+
+        static string addCreateEntityMethod(IEnumerable<Type> types)
+        {
+            var cases = new StringBuilder();
+
+            foreach (var type in types)
+            {
+                var name = type.RemoveComponentSuffix();
+
+                cases.Append(string.Format(@"                   case ComponentIds.{0}:
+                        entity.Add{0}(blueprint.PropertyValues);
+                        break;
+", name));
+            }
+            
+            return "\n" + string.Format(@"        public static Entity CreateEntity(this Pool pool, Entitas.Blueprints.Blueprint blueprint) {{
+            var entity = pool.CreateEntity();
+
+            foreach (var componentType in blueprint.ComponentTypes) {{
+                switch (componentType) {{
+{0}
+                }}
+            }}
+
+            return entity;
+        }}
+", cases);
         }
 
         static string fieldAssignments(MemberTypeNameInfo[] infos)
