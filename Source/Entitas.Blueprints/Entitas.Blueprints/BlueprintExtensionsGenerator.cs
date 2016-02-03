@@ -84,7 +84,7 @@
             var ids = lookupTags.Length == 0 ? string.Empty : lookupTags[0];
 
             var memberNameInfos = getFieldInfos(type);
-            var assignments = fieldAssignments(memberNameInfos);
+            var assignments = fieldAssignments(name, memberNameInfos);
 
             return "\n" + string.Format(@"        public Entity Add{0}(System.Collections.Generic.IDictionary<string, object> properties) {{
             var component = _{1}ComponentPool.Count > 0 ? _{1}ComponentPool.Pop() : new {2}();
@@ -122,11 +122,11 @@
 ", cases);
         }
 
-        static string fieldAssignments(MemberTypeNameInfo[] infos)
+        static string fieldAssignments(string componentName, MemberTypeNameInfo[] infos)
         {
-            const string format = "            component.{0} = ({1})properties[\"{0}\"];";
+            const string format = "            component.{0} = ({1})properties[\"{2}.{0}\"];";
             var assignments = infos.Select(info => {
-                return string.Format(format, info.name, info.type);
+                return string.Format(format, info.name, info.type, componentName);
             }).ToArray();
 
             return string.Join("\n", assignments);
