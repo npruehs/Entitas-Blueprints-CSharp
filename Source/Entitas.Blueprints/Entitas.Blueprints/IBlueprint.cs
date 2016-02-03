@@ -2,20 +2,16 @@
 {
     using System.Collections.Generic;
 
-    public class Blueprint : IBlueprint
+    public interface IBlueprint
     {
-        #region Properties
-
         /// <summary>
         ///   Ids of the components to add to the entity.
         /// </summary>
-        public IEnumerable<int> ComponentTypes { get; set; }
+        IEnumerable<int> ComponentTypes { get; }
 
         /// <summary>
         ///   Values to initialize the component properties with.
         /// </summary>
-        public IDictionary<string, object> PropertyValues { get; set; }
-
-        #endregion
+        IDictionary<string, object> PropertyValues { get; }
     }
 }

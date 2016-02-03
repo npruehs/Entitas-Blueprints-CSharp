@@ -108,7 +108,7 @@
 ", name));
             }
             
-            return "\n" + string.Format(@"        public static Entity CreateEntity(this Pool pool, Entitas.Blueprints.Blueprint blueprint) {{
+            return "\n" + string.Format(@"        public static Entity CreateEntity(this Pool pool, Entitas.Blueprints.IBlueprint blueprint) {{
             var entity = pool.CreateEntity();
 
             foreach (var componentType in blueprint.ComponentTypes) {{
