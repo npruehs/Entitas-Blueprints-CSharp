@@ -56,6 +56,7 @@
             var code = addNamespace();
             code += addPoolExtensionClassHeader();
             code += addCreateEntityMethod(types);
+            code += addComponentDictionary(types);
             code += addCloseClass();
             code += closeNamespace();
             return code;
@@ -111,14 +112,33 @@
             return "\n" + string.Format(@"        public static Entity CreateEntity(this Pool pool, Entitas.Blueprints.IBlueprint blueprint) {{
             var entity = pool.CreateEntity();
 
-            foreach (var componentType in blueprint.ComponentTypes) {{
-                switch (componentType) {{
+            foreach (var componentTypeName in blueprint.ComponentTypes) {{
+                var componentId = ComponentNameToId[componentTypeName];
+
+                switch (componentId) {{
 {0}
                 }}
             }}
 
             return entity;
         }}
+", cases);
+        }
+
+        static string addComponentDictionary(IEnumerable<Type> types)
+        {
+            var cases = new StringBuilder();
+
+            foreach (var type in types)
+            {
+                var name = type.RemoveComponentSuffix();
+
+                cases.AppendLine(string.Format("            {{ \"{0}\", ComponentIds.{0} }},", name));
+            }
+
+            return "\n" + string.Format(@"        private static System.Collections.Generic.Dictionary<string, int> ComponentNameToId = new System.Collections.Generic.Dictionary<string, int> {{
+{0}
+        }};
 ", cases);
         }
 

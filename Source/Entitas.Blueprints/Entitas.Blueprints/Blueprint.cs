@@ -4,12 +4,29 @@
 
     public class Blueprint : IBlueprint
     {
+        #region Constructors and Destructors
+
+        public Blueprint()
+            : this(string.Empty)
+        {
+        }
+
+        public Blueprint(string id)
+        {
+            this.Id = id;
+
+            this.ComponentTypes = new List<string>();
+            this.PropertyValues = new Dictionary<string, object>();
+        }
+
+        #endregion
+
         #region Properties
 
         /// <summary>
-        ///   Ids of the components to add to the entity.
+        ///   Types of the components to add to the entity.
         /// </summary>
-        public IEnumerable<int> ComponentTypes { get; set; }
+        public IList<string> ComponentTypes { get; set; }
 
         /// <summary>
         ///   Unique identifier of this blueprint.
