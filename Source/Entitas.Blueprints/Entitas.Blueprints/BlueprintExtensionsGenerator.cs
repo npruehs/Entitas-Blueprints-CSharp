@@ -37,15 +37,19 @@
 
         static bool shouldGenerate(Type type)
         {
-            return !Attribute.GetCustomAttributes(type).Any(attr => attr is DontGenerateAttribute)
-                   && !isSingletonComponent(type);
+            return !Attribute.GetCustomAttributes(type).Any(attr => attr is DontGenerateAttribute);
         }
 
         static string addDefaultPoolCode(Type type)
         {
             var code = addNamespace();
             code += addEntityClassHeader();
-            code += addBlueprintMethod(type);
+
+            if (!isSingletonComponent(type))
+            {
+                code += addBlueprintMethod(type);
+            }
+
             code += addCloseClass();
             code += closeNamespace();
             return code;
@@ -103,10 +107,18 @@
             {
                 var name = type.RemoveComponentSuffix();
 
-                cases.Append(string.Format(@"                   case ComponentIds.{0}:
-                        entity.Add{0}(blueprint.PropertyValues);
-                        break;
-", name));
+                cases.AppendLine(string.Format(@"                   case ComponentIds.{0}:", name));
+
+                if (isSingletonComponent(type))
+                {
+                    cases.AppendLine(string.Format(@"                        entity.Is{0}(true);", name));
+                }
+                else
+                {
+                    cases.AppendLine(string.Format(@"                        entity.Add{0}(blueprint.PropertyValues);", name));
+                }
+
+                cases.AppendLine("                        break;");
             }
             
             return "\n" + string.Format(@"        public static Entity CreateEntity(this Pool pool, Entitas.Blueprints.IBlueprint blueprint) {{
