@@ -43,7 +43,7 @@
   <ItemGroup>
     <Compile Include="Entitas.Blueprints.Xml\BlueprintXmlSerializer.cs" />
     <Compile Include="Entitas.Blueprints\Blueprint.cs" />
-    <Compile Include="Entitas.Blueprints\BlueprintExtensionsGenerator.cs" />
+    <Compile Include="Entitas.Blueprints.CodeGenerator\BlueprintExtensionsGenerator.cs" />
     <Compile Include="Entitas.Blueprints\IBlueprint.cs" />
     <Compile Include="Entitas.CodeGenerator\Attributes\CustomPrefixAttribute.cs" />
     <Compile Include="Entitas.CodeGenerator\Attributes\DontGenerateAttribute.cs" />

@@ -1,4 +1,4 @@
-﻿namespace Entitas.Blueprints
+﻿namespace Entitas.Blueprints.CodeGenerator
 {
     using System.Collections.Generic;
     using System.Linq;
