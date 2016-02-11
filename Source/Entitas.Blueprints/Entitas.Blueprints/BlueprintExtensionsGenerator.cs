@@ -1,9 +1,7 @@
 ﻿namespace Entitas.Blueprints
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
     using System.Text;
 
     using Entitas.CodeGenerator;
@@ -12,42 +10,38 @@
     {
         const string CLASS_SUFFIX = "GeneratedBlueprintsExtension";
 
-        public CodeGenFile[] Generate(Type[] components)
+        public CodeGenFile[] Generate(ComponentInfo[] componentInfos)
         {
-            var codeGenFiles = components
-                    .Where(shouldGenerate)
-                    .Aggregate(new List<CodeGenFile>(), (files, type) => {
-                        files.Add(new CodeGenFile
-                        {
-                            fileName = type + CLASS_SUFFIX,
-                            fileContent = addDefaultPoolCode(type).ToUnixLineEndings()
-                        });
-                        return files;
-                    }).ToList();
+            var codeGenFiles = componentInfos
+                    .Where(info => info.generateMethods && !info.isSingletonComponent)
+                    .Select(
+                        info =>
+                            new CodeGenFile
+                            {
+                                fileName = info.fullTypeName + CLASS_SUFFIX,
+                                fileContent = addDefaultPoolCode(info).ToUnixLineEndings()
+                            })
+                    .ToList();
 
-            codeGenFiles.Add(new CodeGenFile
-            {
-                fileName = "BlueprintPoolExtensions",
-                fileContent = addBlueprintPoolCode(components
-                    .Where(shouldGenerate)).ToUnixLineEndings()
-            });
+            codeGenFiles.Add(
+                new CodeGenFile
+                {
+                    fileName = "BlueprintPoolExtensions",
+                    fileContent =
+                        addBlueprintPoolCode(componentInfos.Where(info => info.generateMethods)).ToUnixLineEndings()
+                });
 
             return codeGenFiles.ToArray();
         }
 
-        static bool shouldGenerate(Type type)
-        {
-            return !Attribute.GetCustomAttributes(type).Any(attr => attr is DontGenerateAttribute);
-        }
-
-        static string addDefaultPoolCode(Type type)
+        static string addDefaultPoolCode(ComponentInfo info)
         {
             var code = addNamespace();
             code += addEntityClassHeader();
 
-            if (!isSingletonComponent(type))
+            if (!info.isSingletonComponent)
             {
-                code += addBlueprintMethod(type);
+                code += addBlueprintMethod(info);
             }
 
             code += addCloseClass();
@@ -55,12 +49,12 @@
             return code;
         }
 
-        static string addBlueprintPoolCode(IEnumerable<Type> types)
+        static string addBlueprintPoolCode(IEnumerable<ComponentInfo> infos)
         {
             var code = addNamespace();
             code += addPoolExtensionClassHeader();
-            code += addCreateEntityMethod(types);
-            code += addComponentDictionary(types);
+            code += addCreateEntityMethod(infos);
+            code += addComponentDictionary(infos);
             code += addCloseClass();
             code += closeNamespace();
             return code;
@@ -81,35 +75,36 @@
             return "\n    public static class BlueprintPoolExtension {";
         }
 
-        static string addBlueprintMethod(Type type)
+        static string addBlueprintMethod(ComponentInfo info)
         {
-            var name = type.RemoveComponentSuffix();
+            var name = info.typeName.RemoveComponentSuffix();
             var nameLowercaseFirst = name.LowercaseFirst();
-            var lookupTags = type.ComponentLookupTags();
+            var lookupTags = info.ComponentLookupTags();
             var ids = lookupTags.Length == 0 ? string.Empty : lookupTags[0];
 
-            var memberNameInfos = getFieldInfos(type);
+            var memberNameInfos = info.fieldInfos;
             var assignments = fieldAssignments(name, memberNameInfos);
 
             return "\n" + string.Format(@"        public Entity Add{0}(System.Collections.Generic.IDictionary<string, object> properties) {{
-            var component = _{1}ComponentPool.Count > 0 ? _{1}ComponentPool.Pop() : new {2}();
+            var componentPool = GetComponentPool(ComponentIds.{0});
+            var component = ({2})(componentPool.Count > 0 ? componentPool.Pop() : new {2}());
 {3}
             return AddComponent({4}.{0}, component);
         }}
-", name, nameLowercaseFirst, type, assignments, ids);
+", name, nameLowercaseFirst, info.typeName, assignments, ids);
         }
 
-        static string addCreateEntityMethod(IEnumerable<Type> types)
+        static string addCreateEntityMethod(IEnumerable<ComponentInfo> infos)
         {
             var cases = new StringBuilder();
 
-            foreach (var type in types)
+            foreach (var info in infos)
             {
-                var name = type.RemoveComponentSuffix();
+                var name = info.typeName.RemoveComponentSuffix();
 
                 cases.AppendLine(string.Format(@"                   case ComponentIds.{0}:", name));
 
-                if (isSingletonComponent(type))
+                if (info.isSingletonComponent)
                 {
                     cases.AppendLine(string.Format(@"                        entity.Is{0}(true);", name));
                 }
@@ -137,13 +132,13 @@
 ", cases);
         }
 
-        static string addComponentDictionary(IEnumerable<Type> types)
+        static string addComponentDictionary(IEnumerable<ComponentInfo> infos)
         {
             var cases = new StringBuilder();
 
-            foreach (var type in types)
+            foreach (var info in infos)
             {
-                var name = type.RemoveComponentSuffix();
+                var name = info.typeName.RemoveComponentSuffix();
 
                 cases.AppendLine(string.Format("            {{ \"{0}\", ComponentIds.{0} }},", name));
             }
@@ -154,7 +149,7 @@
 ", cases);
         }
 
-        static string fieldAssignments(string componentName, MemberTypeNameInfo[] infos)
+        static string fieldAssignments(string componentName, ComponentFieldInfo[] infos)
         {
             const string format = "            component.{0} = ({1})properties[\"{2}.{0}\"];";
             var assignments = infos.Select(info => {
@@ -172,19 +167,6 @@
         static string closeNamespace()
         {
             return "}\n";
-        }
-
-        static MemberTypeNameInfo[] getFieldInfos(Type type)
-        {
-            return type.GetFields(BindingFlags.Instance | BindingFlags.Public)
-                .Select(field => new MemberTypeNameInfo { name = field.Name, type = field.FieldType })
-                .ToArray();
-        }
-
-        static bool isSingletonComponent(Type type)
-        {
-            var bindingFlags = BindingFlags.Instance | BindingFlags.Public;
-            return type.GetFields(bindingFlags).Length == 0;
         }
     }
 }
