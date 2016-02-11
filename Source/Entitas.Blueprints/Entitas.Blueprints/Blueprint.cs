@@ -2,15 +2,25 @@
 {
     using System.Collections.Generic;
 
+    /// <summary>
+    ///   Template for creating an entity with all of its components.
+    /// </summary>
     public class Blueprint : IBlueprint
     {
         #region Constructors and Destructors
 
+        /// <summary>
+        ///   Creates a new default blueprint.
+        /// </summary>
         public Blueprint()
             : this(string.Empty)
         {
         }
 
+        /// <summary>
+        ///   Creates a blueprint with the specified id.
+        /// </summary>
+        /// <param name="id">Id of the blueprint to create.</param>
         public Blueprint(string id)
         {
             this.Id = id;

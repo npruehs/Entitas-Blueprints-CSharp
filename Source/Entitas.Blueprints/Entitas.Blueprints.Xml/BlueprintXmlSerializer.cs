@@ -30,6 +30,11 @@
 
         #region Public Methods and Operators
 
+        /// <summary>
+        ///   Reads the next blueprint from the specified reader.
+        /// </summary>
+        /// <param name="reader">Reader to read the next blueprint from.</param>
+        /// <returns>Read blueprint.</returns>
         public Blueprint Read(XmlReader reader)
         {
             reader.Read();
@@ -82,6 +87,11 @@
             return blueprint;
         }
 
+        /// <summary>
+        ///   Writes the passed blueprint to the specified writer.
+        /// </summary>
+        /// <param name="writer">Writer to write the blueprint to.</param>
+        /// <param name="blueprint">Blueprint to write.</param>
         public void Write(XmlWriter writer, IBlueprint blueprint)
         {
             writer.WriteStartElement(BlueprintElementName);

@@ -2,8 +2,13 @@
 {
     using System.Collections.Generic;
 
+    /// <summary>
+    ///   Template for creating an entity with all of its components.
+    /// </summary>
     public interface IBlueprint
     {
+        #region Properties
+
         /// <summary>
         ///   Types of the components to add to the entity.
         /// </summary>
@@ -19,5 +24,7 @@
         ///   Values to initialize the component properties with.
         /// </summary>
         IDictionary<string, object> PropertyValues { get; }
+
+        #endregion
     }
 }
