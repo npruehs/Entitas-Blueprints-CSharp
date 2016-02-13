@@ -1,6 +1,7 @@
 ﻿namespace Entitas.Blueprints.Xml
 {
     using System;
+    using System.Collections.Generic;
     using System.Xml;
     using System.Xml.Serialization;
 
@@ -37,9 +38,6 @@
         /// <returns>Read blueprint.</returns>
         public Blueprint Read(XmlReader reader)
         {
-            reader.Read();
-            reader.Read();
-
             var blueprintId = reader[BlueprintIdAttributeName];
             var blueprint = new Blueprint(blueprintId);
 
@@ -85,6 +83,25 @@
             reader.ReadEndElement();
 
             return blueprint;
+        }
+
+        /// <summary>
+        ///   Reads all following blueprints from the specified reader.
+        /// </summary>
+        /// <param name="xmlReader">Reader to read the blueprints from.</param>
+        /// <returns>Read blueprints.</returns>
+        public List<Blueprint> ReadBlueprints(XmlReader xmlReader)
+        {
+            var blueprints = new List<Blueprint>();
+
+            xmlReader.ReadToFollowing(BlueprintElementName);
+            while (xmlReader.Name == BlueprintElementName)
+            {
+                var blueprint = this.Read(xmlReader);
+                blueprints.Add(blueprint);
+            }
+
+            return blueprints;
         }
 
         /// <summary>
